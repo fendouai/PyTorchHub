@@ -1,0 +1,11 @@
+site_name: PyTorchHub-PyTorch 导航网站
+theme: material
+site_description: PyTorchHub，PyTorch 导航 官方网站，官方文档，视频教程，自然语言处理库，计算机视觉库。
+copyright: Copyright @ 2020, <a href="http://pytorch123.com/">pytorch123</a>
+
+pages:
+    - PyTorchHub: index.md
+    - Awesome-PyTorch-Chinese: Awesome-PyTorch-Chinese.md
+    - Awesome-pytorch-list-CNVersion: Awesome-Pytorch-listCN.md
+    - Awesome-pytorch-list: Awesome-Pytorch-list.md
+

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>使用text-CNN处理自然语言（上） - Keras 从入门到精通教程|KerasChina</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "\u4f7f\u7528text-CNN\u5904\u7406\u81ea\u7136\u8bed\u8a00\uff08\u4e0a\uff09";
+    var mkdocs_page_input_path = "text_cnn_1.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Keras 从入门到精通教程|KerasChina</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">使用Keras进行深度学习</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../keras_intro/">Keras 入门</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../keras_cnn/">CNN讲解及实践</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">使用text-CNN处理自然语言（上）</a>
+    <ul class="subnav">
+            
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../text_cnn_2/">使用text-CNN处理自然语言（下）</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../keras_rnn/">RNN和双向RNN讲解及实践</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../keras_lstm/">LSTM和双向LSTM讲解及实践</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../keras_gru/">GRU讲解及实践</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Keras 从入门到精通教程|KerasChina</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>使用text-CNN处理自然语言（上）</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>上一篇文章中一直围绕着CNN处理图像数据进行讲解，而CNN除了处理图像数据之外，还适用于文本分类。CNN模型首次使用在文本分类，是Yoon Kim发表的“Convolutional Neural Networks for Sentence Classification”论文中。在讲解text-CNN之前，先介绍自然语言处理和Keras对自然语言的预处理。</p>
+<p>自然语言处理就是通过对文本进行分析，从文本中提取关键词来让计算机处理或理解自然语言，完成一些有用的应用，如：情感分析，问答系统等。比如在情感分析中，其本质就是根据已知的文字和情感符号（如评论等）推测这段文字是正面还是负面的。想象一下，如果我们能够更加精确地进行情感分析，可以大大提升人们对于事物的理解效率。比如不少基金公司利用人们对于某家公司的看法态度来预测未来股票的涨跌。</p>
+<p>接下来将使用imdb影评数据集简单介绍Keras如何预处理文本数据。该数据集在<a href="http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz">这里</a>下载。由于下载得的是tar.gz压缩文件，可以使用python的tarfile模块解压。解压后的目录为：</p>
+<p><img class="alignnone size-full wp-image-1793 aligncenter" src="http://www.tensorflownews.com/wp-content/uploads/2018/04/1-2.png" alt="" width="595" height="252" /></p>
+<p><strong>1.</strong><strong>读取</strong><strong>imdb</strong><strong>数据集</strong></p>
+<p>我们通过以下函数分别读取train和test中的所有影评</p>
+<p><img class="alignnone size-full wp-image-1794 aligncenter" src="http://www.tensorflownews.com/wp-content/uploads/2018/04/2-1.png" alt="" width="1152" height="641" /></p>
+<p>&nbsp;</p>
+<p>得到的影评如下图，每条影评用双引号包住。</p>
+<p><img class="alignnone size-full wp-image-1795" src="http://www.tensorflownews.com/wp-content/uploads/2018/04/3-1.png" alt="" width="1174" height="223" /></p>
+<p>&nbsp;</p>
+<p><strong>2.</strong><strong>使用</strong><strong>Tokenizer</strong><strong>将影评文字转换成数字特征</strong></p>
+<p>在上文中已经得到了每条影评文字了，但是text-CNN的输入应该是数字矩阵。可以使用Keras的Tokenizer模块实现转换。</p>
+<p>简单讲解Tokenizer如何实现转换。当我们创建了一个Tokenizer对象后，使用该对象的fit_on_texts()函数，可以将输入的文本中的每个词编号，编号是根据词频的，词频越大，编号越小。可能这时会有疑问：Tokenizer是如何判断文本的一个词呢？其实它是以空格去识别每个词。因为英文的词与词之间是以空格分隔，所以我们可以直接将文本作为函数的参数，但是当我们处理中文文本时，我们需要使用分词工具将词与词分开，并且词间使用空格分开。具体实现如下：</p>
+<p><img class="alignnone size-full wp-image-1796" src="http://www.tensorflownews.com/wp-content/uploads/2018/04/4-1.png" alt="" width="1202" height="113" /></p>
+<p>&nbsp;</p>
+<p>使用word_index属性可以看到每次词对应的编码，可以发现类似”the”、”a”等词的词频很高，但是这些词并不能表达文本的主题，我们称之为停用词。对文本预处理的过程中，我们希望能够尽可能提取到更多关键词去表达这句话或文本的中心思想，因此我们可以将这些停用词去掉后再编码。网上有许多归纳好的停用词，大家可以下载了之后，去除该文本中的停用词。</p>
+<p><img class="alignnone size-full wp-image-1797" src="http://www.tensorflownews.com/wp-content/uploads/2018/04/5-1.png" alt="" width="1188" height="248" /></p>
+<p>&nbsp;</p>
+<p>对每个词编码之后，每句影评中的每个词就可以用对应的编码表示，即每条影评已经转变成一个向量了：</p>
+<p><img class="alignnone size-full wp-image-1798" src="http://www.tensorflownews.com/wp-content/uploads/2018/04/6-1.png" alt="" width="1201" height="93" /></p>
+<p><strong> </strong></p>
+<p><strong>3.</strong><strong>让每句数字影评长度相同</strong></p>
+<p>对每个词编码之后，每句影评中的每个词就可以用对应的编码表示，即每条影评已经转变成一个向量。但是，由于影评的长度不唯一，需要将每条影评的长度设置一个固定值。</p>
+<p><img class="alignnone size-full wp-image-1799" src="http://www.tensorflownews.com/wp-content/uploads/2018/04/7.png" alt="" width="1209" height="95" /></p>
+<p>&nbsp;</p>
+<p>每个句子的长度都固定为150，如果长度大于150，则将超过的部分截掉；如果小于150，则在最前面用0填充。每个句子如下：</p>
+<p><img class="alignnone size-full wp-image-1800" src="http://www.tensorflownews.com/wp-content/uploads/2018/04/8-1.png" alt="" width="1065" height="416" /></p>
+<p><strong> </strong></p>
+<p><strong>4.</strong><strong>使用</strong><strong>Embedding</strong><strong>层将每个词编码转换为词向量</strong></p>
+<p>通过以上操作，已经将每个句子变成一个向量，但上文已经提及text-CNN的输入是一个数字矩阵，即每个影评样本应该是以一个矩阵，每一行代表一个词，因此，需要将词编码转换成词向量。使用Keras的Embedding层可以实现转换。Embedding层基于上文所得的词编码，对每个词进行one-hot编码，每个词都会以一个vocabulary_size(如上文的2000)维的向量；然后通过神经网络的训练迭代更新得到一个合适的权重矩阵（具体实现过程可以参考skip-gram模型），行大小为vocabulary_size，列大小为词向量的维度，将本来以one-hot编码的词向量映射到低维空间，得到低维词向量。比如the的编号为1，则对应的词向量为权重矩阵的第一行向量。如下图，蓝色线对应权重值组成了该词的词向量。需要声明一点的是Embedding层是作为模型的第一层，在训练模型的同时，得到该语料库的词向量。当然，也可以使用已经预训练好的词向量表示现有语料库中的词。</p>
+<p><img class="alignnone size-full wp-image-1801 aligncenter" src="http://www.tensorflownews.com/wp-content/uploads/2018/04/9-1.png" alt="" width="451" height="475" /></p>
+<p>至此已经将文本数据预处理完毕，将每个影评样本转换为一个数字矩阵，矩阵的每一行表示一个词向量。下图梳理了处理文本数据的一般步骤。在此基础上，可以针对相应数据集的特点对数据集进行特定的处理。比如：在该数据集中影评可能含有一些html标签，我们可以使用正则表达式将这些标签去除。</p>
+<p><img class="alignnone size-full wp-image-1802 aligncenter" src="http://www.tensorflownews.com/wp-content/uploads/2018/04/10.png" alt="" width="930" height="596" /></p>
+<p>下一篇文章，我们将介绍text-CNN模型，利用该模型对imdb数据集进行情感分析，并在文末给出整个项目的完整代码链接。欢迎持续关注!</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../text_cnn_2/" class="btn btn-neutral float-right" title="使用text-CNN处理自然语言（下）">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../keras_cnn/" class="btn btn-neutral" title="CNN讲解及实践"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+      <p>Copyright 2017-2019, <a href="http://panchuangai.com">磐创AI</a>-深圳市磐创网络科技有限公司, All Rights Reserved. <script type="text/javascript" src="https://s4.cnzz.com/z_stat.php?id=1277944012&web_id=1277944012"></script></p>
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../keras_cnn/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../text_cnn_2/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>
